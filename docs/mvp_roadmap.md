@@ -4,33 +4,54 @@ This roadmap outlines how to start building the **Bridge Engine** (Trailer Unloa
 
 ---
 
-## Phase 0: The "Digital-First" Launch (Start Here)
-**Goal**: Familiarize with LeRobot and prove the AI logic without spending on hardware.
+## Phase 0: The "Workflow Discovery" (Current)
+*Progress Update: We have successfully mastered the LeRobot ecosystem. We are currently training a toy model on Google Colab (`aloha_mobile_cabinet`) and have already built a working 3D simulation (`solve_aloha.py`) that successfully executes movements on a Mac Mini. We have proven that our code can "control" a robot head-to-toe before spendings a cent on hardware.*
 
-1.  **Use "Borrowable" Data**: Instead of collecting our own data, we download similar robotics datasets (like `lerobot/aloha_mobile_cabinet`) from the Hugging Face Hub. 
-    *   *Why?* To see how real-world "grab and move" data is structured.
-2.  **Simulation (The Digital Twin)**: We use **MuJoCo** (free and lightweight) or **NVIDIA Isaac Lab** to run a virtual robot in a virtual trailer.
-    *   *Why?* We can practice "Teleoperation" using just a mouse or keyboard in a 3D environment.
-3.  **Cloud-Powered Training**: Since your Mac mini is for light work, we use **Google Colab** (which provides a powerful "Pro" GPU for free or low cost). 
-    *   *Why?* We can train a "Brain" (Policy) in the cloud and then download the finished file to your Mac for testing.
+**Goal**: Familiarize with LeRobot and validate the end-to-end workflow using a toy example.
+1.  **Toy Data**: Use `lerobot/aloha_mobile_cabinet` (training right now on Colab).
+2.  **Simulation Mastery**: Run `solve_aloha.py` on Mac Mini to verify that simulated models can actually move and pick (Success: `aloha_demo.mp4` created).
+3.  **Result**: We have the "Plumbing" ready - we know how to train, download, and simulate.
 
 ---
 
-## Phase 1: The "Body" & The Connection
-**Goal**: Get your *future* physical robot talking to the LeRobot software.
-*   Once we pick a hardware vendor (e.g., a high-payload arm), we write the "Driver" to connect it to our Phase 0 code.
+## Phase 1: The "Foundation Brain" (The Hackathon)
+**Goal**: Use massive compute (Fluidstack) to build a robust **VLA (Vision-Language-Action)** model for Morgan.
+1.  **The Trinity Blending**: Blend Grasping, Categorization, and Navigation datasets into one 1B-5B parameter model.
+2.  **Simulation Validation**: We test the model inside a virtual version of Morgan's trailer.
+3.  **Deliverables**: 
+    *   **Foundation Weights**: Pre-trained VLA checkpoint on Hugging Face.
+    *   **Success Video**: A screen recording of the model successfully performing sorting/unloading in the MuJoCo/Isaac simulation.
+    *   **Benchmark Report**: Performance stats (e.g., success rate over 100 simulated trials).
 
-## Phase 2: "Show & Tell" (Real-World Data)
-**Goal**: Capture human expertise in a real warehouse.
-*   An expert operator unloads a real trailer. We record this as a **`LeRobotDataset`**. This replaces the "borrowed" data from Phase 0.
+---
 
-## Phase 3: Training the "Bridge Brain"
-**Goal**: Refine the AI to handle the specific chaos of *your* customers' trailers.
-*   We take the "Brain" we started in Phase 0 and "Fine-tune" it using the real-world data from Phase 2.
+## Phase 2: Hardware Driver & Data Collection
+**Goal**: Get the physical robot and the AI "talking" the same language.
+*   **The Driver**: Write the software that translates the model's neural outputs (e.g., "move arm to X,Y,Z") into real motor voltages for Morgan's specific hardware.
+*   **Teleoperation**: Use the robot's controllers to record **100 "Gold Standard" Demonstrations** of a human unloading a real trailer. This is the seed data for Phase 3.
 
-## 4. Autonomous Unloading (Deployment)
-**Goal**: Let the robot run live unloads without human help.
-*   The AI runs on the robot's onboard computer to decide its own movements in real-time.
+---
+
+## Phase 3: Pilot Testing & Fine-Tuning
+**Goal**: Bridge the gap between Simulation (Phase 1) and Reality.
+*   **How to test?**: We run the model in "Inference Mode." It takes live camera feeds (Wrist + Mast), processes them through the brain, and sends actions to the Phase 2 Driver.
+*   **The Fine-Tune**: We "train" the Phase 1 Foundation Brain on the 100 demos from Phase 2. This teaches the brain the specific weight and center-of-gravity of Morgan's actual cartons.
+
+---
+
+## Phase 4: Commercial Autonomy & WMS Integration
+**Goal**: 24/7 autonomous unloading in the warehouse.
+*   **Edge Workstation**: We deploy the brain on a **local GPU workstation** sitting in the warehouse for zero-latency control.
+*   **WMS Integration**: We connect the robot to the **Warehouse Management System**. The robot reports box counts, weight data, and destination status directly into the company's existing inventory software.
+*   **Remote Monitoring**: Operators use a dashboard to watch the robot and intervene via tablet/voice only for low-confidence events.
+
+---
+
+## Phase 5: Hardware Optimization (On-board Intelligence)
+**Goal**: Transition from external workstations to "Integrated Autonomy."
+*   **Model Compression (Quantization)**: We use advanced mathematics to "squeeze" the VLA model down without losing intelligence.
+*   **On-board Deployment**: Move the brain directly onto a chip (like NVIDIA Jetson) mounted inside the robot's chest or base.
+*   **Result**: A fully self-contained unit that can be shipped anywhere and deployed instantly with zero external PCs required.
 
 ---
 
