@@ -1,0 +1,4 @@
+[submodule "lerobot-source"]
+	path = lerobot-source
+	url = https://github.com/Terresapan/lerobot-source.git
+	branch = main
