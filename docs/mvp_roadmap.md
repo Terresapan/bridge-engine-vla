@@ -5,7 +5,7 @@ This roadmap outlines how to start building the **Bridge Engine** (Trailer Unloa
 ---
 
 ## Phase 0: The "Workflow Discovery" (Current)
-*Progress Update: We have successfully mastered the LeRobot ecosystem. We are currently training a toy model on Google Colab (`aloha_mobile_cabinet`) and have already built a working 3D simulation (`solve_aloha.py`) that successfully executes movements on a Mac Mini. We have proven that our code can "control" a robot head-to-toe before spendings a cent on hardware.*
+*Progress Update: We have successfully mastered the LeRobot ecosystem. We are currently training a toy model on Google Kaggle (`aloha_mobile_cabinet`) and have already built a working 3D simulation (`solve_aloha.py`) that successfully executes movements on a Mac Mini. We have proven that our code can "control" a robot head-to-toe before spendings a cent on hardware.*
 
 **Goal**: Familiarize with LeRobot and validate the end-to-end workflow using a toy example.
 1.  **Toy Data**: Use `lerobot/aloha_mobile_cabinet` (training right now on Colab).
