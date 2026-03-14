@@ -55,7 +55,25 @@ This roadmap outlines how to start building the **Bridge Engine** (Trailer Unloa
 
 ---
 
-### Why This Workflow Works for Morgan:
-*   **Zero Initial Cost**: Phase 0 uses free simulation tools and public datasets.
-*   **Hardware Agnostic**: We aren't locked into one robot; the AI we build in simulation can be "transplanted" into different physical robots later.
-*   **Scalable Knowledge**: Everything learned in Phase 0 (how to handle data, how to train in Colab) applies directly to the final industrial product.
+---
+
+## Appendix: Competitive Landscape
+
+To bridge the "Reality Gap," we must benchmark against the existing industrial landscape. While many systems exist, few have scaled due to the unpredictability of trailer environments.
+
+### 1. The Global Players
+| Company | Core System | Technical Approach | Strengths | Struggles |
+| :--- | :--- | :--- | :--- | :--- |
+| **Boston Dynamics** (Stretch) | Mobile Manipulator | 7-DoF Arm + Vacuum Gripper | Agile, reach (10ft high), mobile. | High hardware complexity/cost. |
+| **Pickle Robot** | Retrofitted Arm | "Physical AI" & adaptive path planning. | Adaptable to messy box "puzzles." | Lower throughput than fixed systems. |
+| **Mujin** (TruckBot) | Telescoping Conveyor | Conveyor-mounted suction heads. | **Extreme throughput** (1,000+ cph). | Requires fixed infrastructure. |
+| **XYZ Robotics** (Rocky) | Mobile Manipulator | MMR + Multi-pick 3D Vision. | High efficiency (800+ cph). | Navigating very narrow trailers. |
+
+### 2. The "Unsolved" Barriers
+Despite these players, wide-scale adoption is hampered by:
+*   **Perception Blindness**: 3D sensors often struggle with shiny tape, crushed cartons, or shifting stacks during transit.
+*   **Grip Reliability**: Cardboard quality varies wildly; suction often fails on thin or recycled material.
+*   **The Throughput Ceiling**: Most systems still struggle to match a seasoned human team's ability to "clear" a trailer in under 45 minutes.
+
+### 3. Our Unique Angle (Phase 1 Strategy)
+Unlike legacy "Perception-First" systems that use rigid heuristic programming, our **VLA (Vision-Language-Action)** approach focuses on "Physical Commonsense." By training on the **Trinity Blend**, we are teaching the model to *understand* what a box is, how it might shift, and how to recover from a failed grasp—mimicking human intuition rather than just calculating XYZ coordinates.

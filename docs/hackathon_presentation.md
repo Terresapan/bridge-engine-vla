@@ -3,15 +3,20 @@
 ## The Problem
 Training a logistics robot from scratch using only private trailer data takes too long and requires too much expensive data collection. 
 
-## The Hackathon Solution: "Multi-Dataset Blending"
-Instead of training a narrow model to do one thing, we will use the massive Fluidstack GPU compute to train a **Vision-Language-Action (VLA)** foundation model. We will blend multiple open-source datasets (picking, sorting, navigating) together.
+## Market Context: Why This Remains Unsolved
+The industry is currently split between two extremes:
+1.  **High-Precision, Low-Flexibility**: Systems like **Mujin (TruckBot)** achieve incredible throughput (1,000+ cph) but require fixed, expensive infrastructure and struggle with non-standard box "puzzles." 
+2.  **Agile, High-Cost**: Systems like **Boston Dynamics (Stretch)** and **Pickle Robot** use complex heuristics to solve "box puzzles" but are limited by **Perception Blindness** (struggling with crushed cartons/shiny tape) and **Grip Reliability**.
+
+## The Hackathon Solution: "Foundation-First" VLA
+Instead of building narrow heuristics, we will use the massive Fluidstack GPU compute to train a **Vision-Language-Action (VLA)** foundation model. We will blend multiple open-source datasets (picking, sorting, navigating) together.
 
 By the end of the weekend, we will have a single "Base Brain" that understands:
-1. 3D spatial geometry and object boundaries.
-2. How to grasp irregular items.
-3. How to follow basic language commands ("Sort the box").
+1. **Physical Commonsense**: 3D spatial geometry, depth, and object boundaries.
+2. **Failure Recovery**: Using linguistic concepts to "realize" a grasp has failed and retry autonomously.
+3. **Multi-Robot Ready**: A single model that can control both 14-DoF and 6-DoF robots via conditioned robot tokens.
 
-When it is time for the real-world deployment (Phase 2), we simply "fine-tune" this massive Base Brain on a tiny amount of real trailer data, achieving reliability in hours instead of months.
+When it is time for real-world deployment (Phase 2), we simply "fine-tune" this massive Base Brain on a tiny amount of real trailer data, achieving reliability in hours instead of months.
 
 ## Proposed Datasets for Blending
 We searched the Hugging Face `lerobot` repository for high-quality datasets that match our chaotic trailer use case. Crucially, **no narrow pre-built models exist for these specific combinations**, meaning our hackathon output will be a net-new asset.
