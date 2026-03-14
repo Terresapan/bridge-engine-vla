@@ -42,13 +42,19 @@ EOF
 
 srun lerobot-train \
   --policy.type="$POLICY_TYPE" \
-  --dataset.repo_id="$DATASET_REPOS" \
-  --dataset.sampling_weights="$SAMPLING_WEIGHTS" \
+  --dataset.repo_id="$DATASET_REPO_1" \
+  --dataset.repo_id="$DATASET_REPO_2" \
+  --dataset.repo_id="$DATASET_REPO_3" \
+  --dataset.sampling_weights="$SAMPLING_WEIGHT_1" \
+  --dataset.sampling_weights="$SAMPLING_WEIGHT_2" \
+  --dataset.sampling_weights="$SAMPLING_WEIGHT_3" \
   --batch_size="$BATCH_SIZE" \
   --steps="$TRAIN_STEPS" \
   --save_freq="$SAVE_FREQ" \
-  --eval_freq="$EVAL_FREQ" \
+  --eval_freq=0 \
+  --policy.scheduler_decay_steps="$SCHEDULER_DECAY_STEPS" \
   --wandb.enable="$WANDB_ENABLE" \
+  --wandb.project="$WANDB_PROJECT" \
   --output_dir="$RUN_DIR"
 
 echo "[TRAIN] End: $(date -Iseconds)"
