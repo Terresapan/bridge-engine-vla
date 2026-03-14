@@ -15,9 +15,9 @@ This roadmap outlines how to start building the **Bridge Engine** (Trailer Unloa
 ---
 
 ## Phase 1: The "Foundation Brain" (The Hackathon)
-**Goal**: Use massive compute (Fluidstack) to build a robust **VLA (Vision-Language-Action)** model for Morgan.
-1.  **The Trinity Blending**: Blend Grasping, Categorization, and Navigation datasets into one 1B-5B parameter model.
-2.  **Simulation Validation**: We test the model inside a virtual version of Morgan's trailer.
+**Goal**: Use massive compute (Fluidstack 8x H100s) to build a robust **VLA (Vision-Language-Action)** model for Morgan.
+1.  **The Trinity Integration**: Blend Grasping, Categorization, and Navigation datasets (solving DoF and FPS mismatches) into a highly-capable **2.2B parameter foundation model**. 
+2.  **Iterative Validation**: Test the model inside a MuJoCo virtual trailer across 3 distinct training runs to achieve peak performance.
 3.  **Deliverables**: 
     *   **Foundation Weights**: Pre-trained VLA checkpoint on Hugging Face.
     *   **Success Video**: A screen recording of the model successfully performing sorting/unloading in the MuJoCo/Isaac simulation.

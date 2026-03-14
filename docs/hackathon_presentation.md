@@ -51,20 +51,18 @@ Morgan doesn't need a year of data. Once we have the Base Brain from the hackath
 4.  **Result:** Commercial-grade reliability achieved with minimal data.
 
 ## Model Specs & Hackathon Feasibility
-We will target a **Vision-Language-Action (VLA)** architecture (likely a **Pi0 variant** or **SmolVLA**) between **1 Billion and 5 Billion parameters**.
+We will target a **2.2B parameter Vision-Language-Action (VLA)** architecture (e.g., SmolVLM2-2.2B backbone).
 
-*   **The Strategy:** We aren't training a GPT-4 from scratch. We are starting with a **pre-trained brain** (like SigLIP or PaliGemma) and simply **"co-training"** it on our three robotics datasets. 
-*   **Feasibility:** On high-end GPUs, we can process millions of frames of robotics data. Within a **36-hour window** on a high-end cluster, this is perfect for producing a high-intelligence **"Hackathon Foundation Model."**
+*   **The "Goldilocks" Strategy:** A 450M model struggles with the logic required for "Sorting" tasks, while a 7B model would massively overfit our small 180k-frame dataset (memorizing backgrounds instead of physics). A 2.2B model provides the perfect balance: it has enough VLM "Brain" power to follow semantic instructions (e.g., "blue box"), but is small enough to generalize.
+*   **The 3-Run Feasibility:** On an 8x H100 cluster, we will use advanced **FSDP (Fully Sharded Data Parallel) and FP8 precision**. This allows us to use massive batch sizes (1024) and finish a full training run in **under 6 hours**. This blistering speed gives us the luxury to run 3 full iterative "A/B testing" loops during the 36-hour hackathon, guaranteeing a polished "Foundation Model" by Sunday.
+*   **Future Scaling:** As Morgan gathers millions of frames of real-world warehouse data (Phase 3+), we can scale this architecture up to the massive 10B+ parameter variants for handling extreme edge cases.
 
-## Infrastructure Request: Fluidstack GPU Clusters
-During the 5:00 PM webinar, you should make a clear, technical request for **High-Interconnect Multi-Node Compute**. Based on their fleet, here is what we need:
+## Compute Strategy: The Thinking Machines VMs
+We do not have access to the $100k B200 superclusters, and we do not need them.
+We were awarded a **$250 API Credit** from Thinking Machines, which perfectly handles Phase 1. 
 
-*   **Primary Request:** 1x Node with **8x NVIDIA H100 (80GB)** GPUs. 
-*   **Networking Requirements:** Must have **InfiniBand Interconnect** (Fluidstack clusters support up to 3.2 Tb/s). This ensures the 8 GPUs can talk to each other fast enough to train the foundation model.
-*   **Alternative:** 1x Node with **8x NVIDIA A100 (80GB)** GPUs. (Slower than H100, but still very capable for our data size).
-
-> [!NOTE]
-> Even though H100s are expensive, they are standard "prize" inventory for Fluidstack hackathons. Providing one 8-GPU node for 48 hours is a very common sponsorship level. 
+*   **The pivot:** Thinking Machines' autonomous "Tinker API" only supports Language Models. However, their cloud platform offers raw **A100 and H100 GPU virtual machines**. We will simply apply our $250 credit toward renting a raw Ubuntu VM. 
+*   **The Runway:** The $250 credit allows us to rent an A100 instance for roughly **100 hours** of continuous compute time. Because our SmolVLA architecture is highly efficient (450M parameters), we will reach convergence within 15-24 hours natively executing `lerobot-train`. This leaves us with plenty of budget to spare for evaluation runs. 
 
 
 ## Key Decisions Needed from Morgan

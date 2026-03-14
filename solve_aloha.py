@@ -8,7 +8,9 @@ import rerun as rr
 
 def run_trained_aloha():
     print("🚀 Loading pre-trained ACT model for ALOHA Transfer Cube...")
-    preload_id = "lerobot/act_aloha_sim_transfer_cube_human"
+    # 🔽 CHANGE THIS 🔽 to your Hugging Face username (e.g., "terresa/aloha_act_sim_transfer_cube")
+    # This automatically downloads your 207MB model.safetensors directly from your account!
+    preload_id = "Terresa/my-first-act-aloha"
     
     # 1. Setup the environment
     print("🌍 Booting up MuJoCo Physics Engine...")
@@ -20,27 +22,31 @@ def run_trained_aloha():
     policy = ACTPolicy.from_pretrained(preload_id)
     policy.eval()
     
-    if torch.cuda.is_available():
-        policy.to("cuda")
-    elif torch.backends.mps.is_available():
-        policy.to("mps")
+    dev = next(policy.parameters()).device
+    if torch.cuda.is_available(): dev = "cuda"
+    elif torch.backends.mps.is_available(): dev = "mps"
+    policy.to(dev)
 
-    # The older v0.4.0 ACT checkpoints have their normalization inside the safetensors, 
-    # so we'll load them manually since v0.5.0 expects a policy_preprocessor.json
+    # 3. Load Normalization Stats (v0.5.0 style)
     from huggingface_hub import hf_hub_download
     from safetensors.torch import load_file
-    sf_path = hf_hub_download(preload_id, "model.safetensors")
-    sf_dict = load_file(sf_path)
+    stats_file = "policy_preprocessor_step_3_normalizer_processor.safetensors"
+    try:
+        stats_path = hf_hub_download(preload_id, stats_file)
+    except:
+        # Fallback for some older v0.5 naming schemes
+        stats_path = hf_hub_download(preload_id, "policy_preprocessor.safetensors")
     
-    dev = next(policy.parameters()).device
-    def get_norm(key): return sf_dict[key].to(dev)
+    stats = load_file(stats_path)
     
-    img_mean = get_norm("normalize_inputs.buffer_observation_images_top.mean").view(1, 3, 1, 1)
-    img_std = get_norm("normalize_inputs.buffer_observation_images_top.std").view(1, 3, 1, 1)
-    state_mean = get_norm("normalize_inputs.buffer_observation_state.mean").view(1, 14)
-    state_std = get_norm("normalize_inputs.buffer_observation_state.std").view(1, 14)
-    action_mean = get_norm("unnormalize_outputs.buffer_action.mean").view(1, 14)
-    action_std = get_norm("unnormalize_outputs.buffer_action.std").view(1, 14)
+    def get_stat(key): return stats[key].to(dev)
+    
+    img_mean = get_stat("observation.images.top.mean").view(1, 3, 1, 1)
+    img_std = get_stat("observation.images.top.std").view(1, 3, 1, 1)
+    state_mean = get_stat("observation.state.mean").view(1, 14)
+    state_std = get_stat("observation.state.std").view(1, 14)
+    action_mean = get_stat("action.mean").view(1, 14)
+    action_std = get_stat("action.std").view(1, 14)
 
     print("🤖 Starting autonomous control...")
     
@@ -49,21 +55,26 @@ def run_trained_aloha():
     frames = []
     
     while not done:
-        # Manual Preprocessing
+        # 1. Format Image (H,W,C -> 1,C,H,W)
         img = torch.from_numpy(observation["pixels"]["top"]).float() / 255.0
-        if img.shape[-1] == 3: img = img.permute(0, 3, 1, 2)
+        if img.ndim == 3: img = img.permute(2, 0, 1).unsqueeze(0)
+        elif img.ndim == 4: img = img.permute(0, 3, 1, 2)
+            
+        # 2. Format State (1,14)
         state = torch.from_numpy(observation["agent_pos"]).float()
+        if state.ndim == 1: state = state.unsqueeze(0)
         
+        # 3. Apply Normalization
         obs_dict = {
             "observation.images.top": (img.to(dev) - img_mean) / img_std,
             "observation.state": (state.to(dev) - state_mean) / state_std,
         }
         
-        # Determine the action
+        # 4. Predict
         with torch.inference_mode():
             action = policy.select_action(obs_dict)
             
-        # Manual Postprocessing (Action unnormalization)
+        # 5. Unnormalize Action
         action_real = action * action_std + action_mean
         action_numpy = action_real.cpu().numpy()
         
@@ -83,8 +94,8 @@ def run_trained_aloha():
 
     print(f"✅ Task complete in {len(frames)} frames! Saving video...")
     import imageio
-    imageio.mimsave("aloha_demo.mp4", frames, fps=50)
-    print("🎥 Saved video to aloha_demo.mp4! Double-click it on your Mac to view.")
+    imageio.mimsave("aloha_demo_real.mp4", frames, fps=50)
+    print("🎥 Saved video to aloha_demo_real.mp4! Double-click it on your Mac to view.")
 
 if __name__ == "__main__":
     run_trained_aloha()
