@@ -7,7 +7,16 @@ cd "$REPO_ROOT"
 source scripts/slurm/run.env
 mkdir -p logs/slurm
 
-RUN_DIR="${OUTPUT_ROOT}/${RUN_NAME}"
+if [[ "${RESUME,,}" == "true" ]]; then
+  if [[ -z "${RESUME_RUN_DIR}" ]]; then
+    echo "RESUME=true requires RESUME_RUN_DIR"
+    exit 1
+  fi
+  RUN_DIR="${RESUME_RUN_DIR}"
+  RUN_NAME="$(basename "$RUN_DIR")"
+else
+  RUN_DIR="${OUTPUT_ROOT}/${RUN_NAME}"
+fi
 
 jid_train=$(sbatch --export=ALL,RUN_DIR="$RUN_DIR" scripts/slurm/train_main.sh | awk '{print $4}')
 jid_eval=$(sbatch --dependency=afterok:${jid_train} --export=ALL,RUN_DIR="$RUN_DIR" scripts/slurm/eval_and_validate.sh | awk '{print $4}')

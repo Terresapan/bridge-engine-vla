@@ -33,30 +33,47 @@ def main():
     scheduler_decay_steps = int(os.environ.get("SCHEDULER_DECAY_STEPS", "120000"))
     wandb_enable = os.environ.get("WANDB_ENABLE", "true").lower() == "true"
     wandb_project = os.environ.get("WANDB_PROJECT", "bridge-engine")
+    resume = os.environ.get("RESUME", "false").lower() == "true"
+    resume_checkpoint = os.environ.get("RESUME_CHECKPOINT", "last")
 
-    policy_cfg = make_policy_config(
-        policy_type,
-        scheduler_decay_steps=scheduler_decay_steps,
-        push_to_hub=False,
-    )
+    if resume:
+        checkpoint_dir = Path(run_dir) / "checkpoints" / resume_checkpoint
+        cfg = TrainPipelineConfig.from_pretrained(checkpoint_dir / "pretrained_model")
+        cfg.resume = True
+        cfg.checkpoint_path = checkpoint_dir
+        cfg.policy.pretrained_path = checkpoint_dir / "pretrained_model"
+        cfg.dataset.repo_id = repo_ids
+        cfg.dataset.sampling_weights = sampling_weights
+        cfg.dataset.video_backend = "pyav"
+        cfg.output_dir = Path(run_dir)
+        cfg.eval_freq = 0
+        cfg.save_freq = save_freq
+        cfg.wandb.enable = wandb_enable
+        cfg.wandb.project = wandb_project
+    else:
+        policy_cfg = make_policy_config(
+            policy_type,
+            scheduler_decay_steps=scheduler_decay_steps,
+            push_to_hub=False,
+        )
 
-    cfg = TrainPipelineConfig(
-        dataset=DatasetConfig(
-            repo_id=repo_ids,
-            sampling_weights=sampling_weights,
-            video_backend="pyav",
-        ),
-        policy=policy_cfg,
-        output_dir=Path(run_dir),
-        batch_size=batch_size,
-        steps=train_steps,
-        save_freq=save_freq,
-        eval_freq=0,
-        wandb=WandBConfig(
-            enable=wandb_enable,
-            project=wandb_project,
-        ),
-    )
+        cfg = TrainPipelineConfig(
+            dataset=DatasetConfig(
+                repo_id=repo_ids,
+                sampling_weights=sampling_weights,
+                video_backend="pyav",
+            ),
+            policy=policy_cfg,
+            output_dir=Path(run_dir),
+            batch_size=batch_size,
+            steps=train_steps,
+            save_freq=save_freq,
+            eval_freq=0,
+            wandb=WandBConfig(
+                enable=wandb_enable,
+                project=wandb_project,
+            ),
+        )
 
     train(cfg)
 
