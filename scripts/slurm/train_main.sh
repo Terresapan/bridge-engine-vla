@@ -11,7 +11,7 @@
 
 set -euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+REPO_ROOT="${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 cd "$REPO_ROOT"
 
 source scripts/slurm/run.env
@@ -24,7 +24,6 @@ export TMPDIR
 export HF_HUB_ENABLE_HF_TRANSFER=1
 
 RUN_DIR="${OUTPUT_ROOT}/${RUN_NAME}"
-mkdir -p "$RUN_DIR"
 
 echo "$RUN_DIR" > "$REPO_ROOT/logs/slurm/latest_run_dir.txt"
 
@@ -40,21 +39,7 @@ EOF
 # source /mnt/sharefs/$USER/miniconda3/etc/profile.d/conda.sh
 # conda activate lerobot
 
-srun lerobot-train \
-  --policy.type="$POLICY_TYPE" \
-  --dataset.repo_id="$DATASET_REPO_1" \
-  --dataset.repo_id="$DATASET_REPO_2" \
-  --dataset.repo_id="$DATASET_REPO_3" \
-  --dataset.sampling_weights="$SAMPLING_WEIGHT_1" \
-  --dataset.sampling_weights="$SAMPLING_WEIGHT_2" \
-  --dataset.sampling_weights="$SAMPLING_WEIGHT_3" \
-  --batch_size="$BATCH_SIZE" \
-  --steps="$TRAIN_STEPS" \
-  --save_freq="$SAVE_FREQ" \
-  --eval_freq=0 \
-  --policy.scheduler_decay_steps="$SCHEDULER_DECAY_STEPS" \
-  --wandb.enable="$WANDB_ENABLE" \
-  --wandb.project="$WANDB_PROJECT" \
-  --output_dir="$RUN_DIR"
+srun /mnt/sharefs/user29/miniconda3/bin/conda run -n lerobot312 \
+  python scripts/slurm/launch_train.py
 
 echo "[TRAIN] End: $(date -Iseconds)"
